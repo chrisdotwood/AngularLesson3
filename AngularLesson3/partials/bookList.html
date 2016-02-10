@@ -1,0 +1,27 @@
+﻿<div ng-show="loading">Loading data...</div>
+
+<div ng-hide="loading">
+    <div>
+        <p>Search</p>
+        <input type="text" ng-model="query" />
+        <button ng-click="search()">Search</button>
+    </div>
+
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>First</th>
+                <th>Last</th>
+                <th></th>
+        </thead>
+        <tbody>
+            <tr ng-repeat="book in books">
+                <td>{{book.volumeInfo.title}}</td>
+                <td>{{book.volumeInfo.authors}}</td>
+                <td><a href="/#/book/{{$index}}">Details</a></td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
