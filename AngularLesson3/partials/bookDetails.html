@@ -1,0 +1,29 @@
+﻿<pagetitle title="Book Details" ></pagetitle>
+
+<div ng-controller="bookDetailsController">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3>{{book.volumeInfo.title}}</h3>
+        </div>
+        <div class="panel-body">
+            <table class="table">
+                <tr>
+                    <td>Authors</td>
+                    <td>{{book.volumeInfo.authors.join()}}</td>
+                </tr>
+                <tr>
+                    <td>Publisher</td>
+                    <td>{{book.volumeInfo.publisher}}</td>
+                </tr>
+                <tr>
+                    <td>Publish Date</td>
+                    <td>{{book.volumeInfo.publishedDate}}</td>
+                </tr>
+                <tr>
+                    <td>Description</td>
+                    <td>{{book.volumeInfo.description}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

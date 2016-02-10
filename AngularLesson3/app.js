@@ -6,12 +6,24 @@ angular.module("flipApp", ["ngRoute"])
         $routeProvider
             .when("/", { templateUrl: 'partials/peopleList.html', controller: 'flipController' })
             .when("/book", { templateUrl: 'partials/bookList.html', controller: 'bookController' })
-            .when("/book/:id", { templateUrl: 'partials/booksDetails.html', controller: 'bookController' })
-            .when("/view/:id", { templateUrl: 'partials/peopleDetails.html', controller: 'viewController' })
+            .when("/book/:id", { templateUrl: 'partials/bookDetails.html', controller: 'bookDetailsController' })
+            .when("/view/:id", { templateUrl: 'partials/peopleDetails.html', controller: 'peopleDetailsController' })
             .when("/about", { templateUrl: 'partials/about.html' })
             .otherwise({ redirectTo: '/' });
     })
-    .controller("flipController", function ($scope, $http) {
+    .service("bookService", function () {
+        var books;
+
+        return {
+            getBooks: function () {
+                return books;
+            },
+            setBooks: function (data) {
+                books = data;
+            }
+        };
+    })
+    .controller("flipController", ['$scope', '$http', function ($scope, $http) {
         $scope.title = "Flip - Reading Log";
         $scope.filter;
 
@@ -21,13 +33,21 @@ angular.module("flipApp", ["ngRoute"])
                 $scope.$emit("UNLOAD");
             });
 
+        ///////////////////////
+        //$http.get("https://www.googleapis.com/books/v1/volumes?q=test")
+        //    .success(function (data) {
+        //        $scope.books = data.items;
+        //        $scope.$emit("UNLOAD");
+        //    });
+        ////////////////////////////
+
         $scope.$on("LOAD", function () { $scope.loading = true });
         $scope.$on("UNLOAD", function () { $scope.loading = false });
 
         $scope.$emit("LOAD");
 
-    })
-    .controller('bookController', function ($scope, $http) {
+    }])
+    .controller('bookController', ['$scope', '$http', 'bookService', function ($scope, $http, bookService) {
         $scope.query;
 
         $scope.search = function () {
@@ -38,14 +58,35 @@ angular.module("flipApp", ["ngRoute"])
             }
 
             $http.get(url)
-                .success(function (data) {
-                    $scope.books = data.items;
-                });
+              .success(function (data) {
+                  $scope.books = data.items;
 
+                  bookService.setBooks($scope.books);
+
+                  $scope.$emit("UNLOAD");
+            });
         };
-  
-    })
-    .controller('viewController', ['$scope', '$routeParams', function ($scope, $routeParams) {
+
+        var storedBooks = bookService.getBooks();
+
+        if (storedBooks != null && storedBooks.length > 0) {
+            $scope.books = storedBooks;
+        }
+
+    }])
+    .controller('bookDetailsController', ['$scope', '$routeParams', 'bookService', function ($scope, $routeParams, bookService) {
+        $scope.book = bookService.getBooks()[$routeParams.id];
+    }])
+    .controller('peopleDetailsController', ['$scope', '$routeParams', function ($scope, $routeParams) {
         $scope.person = $scope.people[$routeParams.id];
-    }]);
+    }])
+    .directive("pagetitle", function() {
+        return {
+            restrict: 'E',
+            link: function (scope, e, a) {
+                scope.title = a.title;
+            },
+            template: "<h2>{{title}}</h2>"
+        };
+    });
 
